@@ -1,0 +1,6 @@
+#define WIFI_SSID  "ssid"
+#define WIFI_PASSWORD "password"
+
+#define RADIO_PORT 80
+#define RADIO_HOST "ice1.somafm.com" 
+#define RADIO_PATH "/u80s-128-mp3" 
