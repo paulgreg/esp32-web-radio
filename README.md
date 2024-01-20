@@ -2,42 +2,38 @@
 
 An ESP32 web radio, inspired by [KitchenRadio](https://github.com/jeroenlukas/KitchenRadio). 🙏
 
-
 ## Hardware
 
- - esp32
- - Adafruit VS1053 breakout
- - jack connector
-
+ - ESP32-WROOM-32D/ESP32-WROOM-32U with Antenna
+ - VS1003B VS1053 MP3 Module Development Board Onboard recording function
 
 ## Connections
 
-Follow [Adafruit VS1053 wiring tutorial](https://learn.adafruit.com/adafruit-vs1053-mp3-aac-ogg-midi-wav-play-and-record-codec-tutorial/simple-audio-player-wiring) and use [SPI3 on esp32](https://techoverflow.net/2021/07/26/what-is-the-spi-pinout-of-the-esp32-esp-wroom-32/)
 
+  | VS1053  | ESP8266 |  ESP32   |
+  ----------|---------|-----------
+  |   SCK   |   D5    |   IO18   |
+  |   MISO  |   D6    |   IO19   |
+  |   MOSI  |   D7    |   IO23   |
+  |   XRST  |   RST   |   EN     |
+  |   CS    |   D1    |   IO5    |
+  |   DCS   |   D0    |   IO16   |
+  |   DREQ  |   D3    |   IO4    |
+  |   5V    |   5V    |   5V     |
+  |   GND   |   GND   |   GND    |
 
-- VS1053 -> ESP32
----
-- VCC  -> 3.3v
-- GND  -> GND
-- XDCS -> IO 21 
-- SDCS -> IO 17 
-- CS   -> IO 05
-- RST  -> RST
-- SCLK -> IO 18
-- MOSI -> IO 23
-- MISO -> IO 19
-- DREQ -> IO 26
-- AGND -> Center 'ground' pin on jack connector
-- LOUT -> Left pin on jack connector
-- ROUT -> Right pin on jack connector
+From [that example](https://github.com/baldram/ESP_VS1053_Library/blob/master/examples/WebRadioDemo/WebRadioDemo.ino).
+
 
 ## Configuration
 
 Copy `parameters.h.dist` to `parameters.h` and change it to your settings
 
+
 ## Librairies
 
-- Adafruit VS1053 Library
+- [baldram/ESP_VS1053_Library](https://github.com/baldram/ESP_VS1053_Library/) : `cd Arduino/libraries && git clone https//github.com/baldram/ESP_VS1053_Library.git)`
+
 
 ## Flash
 

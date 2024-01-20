@@ -4,6 +4,9 @@ boolean connectToWifi() {
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.setAutoConnect(true);
+  WiFi.setAutoReconnect(true);
+  WiFi.reconnect();
   unsigned int retries = 100;
   while (WiFi.status() != WL_CONNECTED && (retries-- > 0)) {
     Serial.print(".");
