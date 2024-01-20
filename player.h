@@ -1,5 +1,0 @@
-#define VS1053_CS     5
-#define VS1053_DCS    16
-#define VS1053_DREQ   4
-
-VS1053 player(VS1053_CS, VS1053_DCS, VS1053_DREQ);

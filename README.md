@@ -22,6 +22,8 @@ An ESP32 web radio, inspired by [KitchenRadio](https://github.com/jeroenlukas/Ki
   |   5V    |   5V    |   5V     |
   |   GND   |   GND   |   GND    |
 
+*Don’t use GND next to 5V ! It won’t boot in my case*
+
 From [that example](https://github.com/baldram/ESP_VS1053_Library/blob/master/examples/WebRadioDemo/WebRadioDemo.ino).
 
 
@@ -33,7 +35,7 @@ Copy `parameters.h.dist` to `parameters.h` and change it to your settings
 ## Librairies
 
 - [baldram/ESP_VS1053_Library](https://github.com/baldram/ESP_VS1053_Library/) : `cd Arduino/libraries && git clone https//github.com/baldram/ESP_VS1053_Library.git)`
-
+- [CelliesProjects/ESP32_VS1053_Stream](https://github.com/CelliesProjects/ESP32_VS1053_Stream) : `cd Arduino/libraries && git clone https://github.com/CelliesProjects/ESP32_VS1053_Stream`
 
 ## Flash
 

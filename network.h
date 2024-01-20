@@ -4,6 +4,7 @@ boolean connectToWifi() {
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.setSleep(false);
   WiFi.setAutoConnect(true);
   WiFi.setAutoReconnect(true);
   WiFi.reconnect();
