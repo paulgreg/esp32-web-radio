@@ -1,4 +1,6 @@
 boolean connectToWifi() {
+  if (WiFi.status() == WL_CONNECTED) return true;
+  
   Serial.print("\nconnecting to ");
   Serial.println(WIFI_SSID);
 
