@@ -1,11 +1,12 @@
 #include "parameters.h"
 
 #include <Button.h>
+#include <Preferences.h>
+
+#include "display.h"
 
 #include <VS1053.h>
 #include <ESP32_VS1053_Stream.h>
-
-#include <Preferences.h>
 
 #include <WiFi.h>
 #include "network.h"
@@ -40,6 +41,8 @@ void setup() {
   }
   Serial.println("decoder running");
 
+  setupScreen();
+
   Serial.println("wifi:connecting");
   if (!connectToWifi()) {
     Serial.println("error:WIFI");
@@ -51,7 +54,6 @@ void setup() {
 
 void loop() {
   stream.loop();
-
   if (buttonNext.pressed()) changeRadio(true);
   if (buttonPrevious.pressed()) changeRadio(false);
   saveRadioIdx();
@@ -59,7 +61,7 @@ void loop() {
 }
 
 void saveRadioIdx() {
-  if (!radioIdxSaved && millis() - lastRadioChange > 10000) {
+  if (!radioIdxSaved && millis() - lastRadioChange > SAVE_RADIO_IDX_DELAY) {
     Serial.println("saveRadio");
     int savedRadioIdx = preferences.getInt("radioIdx", radioIdx);
     if (savedRadioIdx != radioIdx) {
