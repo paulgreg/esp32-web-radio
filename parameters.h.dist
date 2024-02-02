@@ -1,21 +1,31 @@
-#define SPI_CLK_PIN 18
-#define SPI_MISO_PIN 19
-#define SPI_MOSI_PIN 23
+#define SPI_CLK_PIN     18
+#define SPI_MISO_PIN    19
+#define SPI_MOSI_PIN    23
 
-#define VS1053_CS     5
-#define VS1053_DCS    16
-#define VS1053_DREQ   4
+#define VS1053_CS       5
+#define VS1053_DCS      16
+#define VS1053_DREQ     4
 
-#define VOLUME 70 // 100
+#define IR_RECEIVE_PIN  27
+#define IR_NEXT         0x5
+#define IR_PREVIOUS     0x2
+#define IR_VOL_DOWN     0xA
+#define IR_VOL_UP       0x1E
+#define IR_VOL_MUTE     0x16
 
-#define BTN_NEXT 32
-#define BTN_PREVIOUS 33
+#define VOLUME_MAX      100
+#define VOLUME_STEP     2
+#define RADIO_LIMIT     16
+#define SONG_LIMIT      42
 
-#define WIFI_SSID "WIFI_SSID"
-#define WIFI_PASSWORD "WIFI_PASSWORD"
+#define BTN_NEXT        32
+#define BTN_PREVIOUS    33
 
-#define CHANGE_RADIO_DELAY 1000
-#define SAVE_RADIO_IDX_DELAY 60 * 1000
+#define WIFI_SSID       "WIFI_SSID"
+#define WIFI_PASSWORD   "WIFI_PASSWORD"
+
+#define CHANGE_RADIO_DELAY    1000
+#define SAVE_DELAY            60 * 1000
 
 // Some chip aren’t able to decode aac, you can fallback to mp3 streams : #define FIP "http://icecast.radiofrance.fr/fip-mifi.mp3"
 #define FIP "http://icecast.radiofrance.fr/fip-hifi.aac"
@@ -33,6 +43,7 @@
 #define FRANCE_INFO "http://icecast.radiofrance.fr/franceinfo-hifi.aac"
 #define FRANCE_CULTURE "http://icecast.radiofrance.fr/franceculture-hifi.aac"
 #define FRANCE_MUSIQUE "http://icecast.radiofrance.fr/francemusique-hifi.aac"
+#define FRANCE_MUSIQUE_JAZZ "http://icecast.radiofrance.fr/francemusiquelajazz-hifi.aac"
 
 #define BOSSA_NOVA "http://185.33.21.112/bossanova_128"
 #define WAVE "http://75.102.53.58/1066"
@@ -42,7 +53,6 @@
 #define CLASSIC "http://media-ice.musicradio.com/ClassicFMMP3"
 
 #define NIGHTRIDE "http://stream.nightride.fm/nightride.mp3"
-#define WAVERETRO "https://waveretro.ru:8443/stream"
 
 #define NB_RADIOS 22
 const char* RADIOS[NB_RADIOS] = {
@@ -60,14 +70,14 @@ const char* RADIOS[NB_RADIOS] = {
   FRANCE_INFO,
   FRANCE_CULTURE,
   FRANCE_MUSIQUE,
+  FRANCE_MUSIQUE_JAZZ,
   BOSSA_NOVA,
   WAVE,
   LOUNGE,
   FUNKY_RADIO,
   RETRO,
   CLASSIC,
-  NIGHTRIDE,
-  WAVERETRO
+  NIGHTRIDE
 };
 const char* LABELS[NB_RADIOS] = {
   "FIP",
@@ -84,12 +94,12 @@ const char* LABELS[NB_RADIOS] = {
   "France Info",
   "France Culture",
   "France Musique",
+  "France Musique Jazz",
   "Bossa Nova",
   "The Wave",
   "The Lounge",
   "Funky Radio",
   "80s",
   "Classical",
-  "Night Ride",
-  "Wave Retro"
+  "Night Ride"
 };

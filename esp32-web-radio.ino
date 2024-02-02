@@ -1,6 +1,8 @@
 #include "parameters.h"
 #include "string.h"
 
+#include "IRremote.hpp"
+
 #include <Button.h>
 #include <Preferences.h>
 
@@ -12,8 +14,6 @@
 #include <WiFi.h>
 #include "network.h"
 
-#define RADIO_LIMIT 16
-#define SONG_LIMIT 42
 
 Preferences preferences;
 ESP32_VS1053_Stream stream;
@@ -25,6 +25,8 @@ unsigned short radioIdx = 0;
 bool hasRadioIdxChanged = false;
 unsigned long lastAction = millis();
 bool radioIdxSaved = true;
+unsigned int volume = VOLUME_MAX;
+bool volumeSaved = true;
 char radioLabel[255];
 char songLabel[255]; 
 
@@ -35,11 +37,14 @@ void setup() {
   Serial.begin(115200);
   Serial.println("Web Radio");
 
+  IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);  
+
   buttonNext.begin();
   buttonPrevious.begin();
 
   preferences.begin("webradio", false);
   radioIdx = preferences.getInt("radioIdx", radioIdx);
+  volume = preferences.getInt("volume", volume);
 
   setupScreen();
   displayText("Radio");
@@ -63,27 +68,60 @@ void setup() {
     Serial.println("error:WIFI");
     displayError("Wifi error");
   } else {
-    stream.setVolume(VOLUME);
+    stream.setVolume(volume);
     displayText("Lets go");
     startRadio();
   }
 }
 
-bool hasTimePassed (unsigned long time) {
-  return millis() - lastAction > time;
-}
 
 void loop() {    
   if (stream.isRunning()) {
     stream.loop();
     delay(5);
-    saveRadioIdx();
+    savePreferences();
+  } else {
+    delay(250);
+    startRadio();
   }
 
+  handleIRCommands();
   if (buttonNext.pressed()) changeRadioIndex(true);
   else if (buttonPrevious.pressed()) changeRadioIndex(false);
   
   changeRadio();
+}
+
+void handleIRCommands() {
+ if (IrReceiver.decode()) {
+    uint16_t command = IrReceiver.decodedIRData.command;
+    Serial.printf("IRcommand: %u\n", command);
+    switch (command) { 
+      case IR_NEXT: 
+        changeRadioIndex(true);
+        break;
+      case IR_PREVIOUS:
+        changeRadioIndex(false);
+        break;
+      case IR_VOL_UP: 
+        changeVolume(true);
+        break;
+      case IR_VOL_DOWN:
+        changeVolume(false);
+        break;
+      case IR_VOL_MUTE:
+        toggleMute();
+        break;
+      default:	
+        Serial.println("IRCommand: unknown");	  
+    }
+    delay(100);
+		IrReceiver.resume();
+  }
+}
+
+bool hasTimePassed (unsigned long time) {
+  return millis() - lastAction > time;
 }
 
 void copyRadioStation(const char* str) {
@@ -110,14 +148,23 @@ void copyRadioSong(const char* str) {
   }
 }
 
-void saveRadioIdx() {
-  if (stream.isRunning() && !radioIdxSaved && hasTimePassed(SAVE_RADIO_IDX_DELAY)) {
-    Serial.println("should saveRadio");
-    int savedRadioIdx = preferences.getInt("radioIdx", radioIdx);
-    if (savedRadioIdx != radioIdx) {
-      Serial.printf("Save radio index %i\n", radioIdx);
+void savePreferences() {
+  if (hasTimePassed(SAVE_DELAY)) {
+    if (stream.isRunning() && !radioIdxSaved) {
+      Serial.println("should save radio index");
       radioIdxSaved = true;
-      preferences.putInt("radioIdx", radioIdx);
+      if (!preferences.isKey("radioIdx") || preferences.getInt("radioIdx", radioIdx) != radioIdx) {
+        Serial.printf("!!! Save radio index %i\n", radioIdx);
+        preferences.putInt("radioIdx", radioIdx);
+      }
+    }
+     if (!volumeSaved) {
+      Serial.println("should save volume");
+      volumeSaved = true;
+      if (!preferences.isKey("volume") || preferences.getInt("volume", volume) != volume) {
+        Serial.printf("!!! Save volume %i\n", volume);
+        preferences.putInt("volume", volume);
+      }
     }
   }
 }
@@ -137,16 +184,30 @@ void startRadio() {
 
 void changeRadioIndex(bool next) {
   if (stream.isRunning()) stream.stopSong();
-  if (next) {
-    radioIdx = radioIdx < NB_RADIOS - 1 ? radioIdx + 1 : 0;
-  } else {
-    radioIdx = radioIdx > 0 ? radioIdx - 1 : NB_RADIOS - 1;
-  }
+  if (next) radioIdx = radioIdx < NB_RADIOS - 1 ? radioIdx + 1 : 0;
+  else radioIdx = radioIdx > 0 ? radioIdx - 1 : NB_RADIOS - 1;
   copyRadioStation(LABELS[radioIdx]);
   copyRadioSong("");
   displayData(radioLabel, songLabel);
   hasRadioIdxChanged = true;
   lastAction = millis();
+}
+
+void toggleMute() {
+  unsigned int streamVolume = stream.getVolume() == volume;
+  unsigned int v = streamVolume ? 0 : volume;
+  Serial.printf("Mute %u\n", v);
+  stream.setVolume(v);
+}
+
+void changeVolume(bool increase) {
+  volume = stream.getVolume();
+  if (increase && volume <= (VOLUME_MAX - VOLUME_STEP)) volume += VOLUME_STEP;
+  else if (!increase && volume >= VOLUME_STEP) volume -= VOLUME_STEP;
+  Serial.printf("Changing volume %u\n", volume);
+  volumeSaved = false;
+  lastAction = millis();
+  stream.setVolume(volume);
 }
 
 void changeRadio () {
