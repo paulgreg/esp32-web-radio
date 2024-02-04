@@ -38,13 +38,34 @@ void displayError(const char* s) {
   display.display();
 }
 
-void displayData(const char* radio, const char* song) {
+
+char radioBuffer[255];
+char radioSong[255];
+
+void displayData(const char* radio, const char* song, unsigned int volume) {
   display.clearDisplay();
-  display.setFont(&Roboto_Medium_14);
-  display.setCursor(0, 10);
-  display.print(radio);
+
+  if (strlen(song) == 0) {
+    formatString(radio, radioBuffer, 64);
+
+    display.setFont(&Roboto_Medium_16);
+    display.setCursor(0, 20);
+    display.print(radioBuffer);
+  } else {
+    formatString(radio, radioBuffer, RADIO_LIMIT);
+    formatString(song, radioSong, SONG_LIMIT);
+
+    display.setFont(&Roboto_Medium_14);
+    display.setCursor(0, 10);
+    display.print(radioBuffer);
+    display.setFont(&Roboto_Medium_12);
+    display.setCursor(0, 30);
+    display.print(radioSong);
+  }
+
   display.setFont(&Roboto_Medium_12);
-  display.setCursor(0, 30);
-  display.print(song);
+  display.setCursor(80, 60);
+  display.printf("%*i %%", 3, volume);
+
   display.display();
 }

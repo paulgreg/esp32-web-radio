@@ -28,11 +28,11 @@ bool radioIdxSaved = true;
 unsigned int volume = VOLUME_MAX;
 bool volumeSaved = true;
 char radioLabel[255];
-char songLabel[255]; 
+char songLabel[255];
+unsigned int tries = 0;
 
 void setup() {
-  radioLabel[0] = '\0';
-  songLabel[0]= '\0';
+  radioLabel[0] = songLabel[0] ='\0';
 
   Serial.begin(115200);
   Serial.println("Web Radio");
@@ -77,13 +77,15 @@ void setup() {
 
 void loop() {    
   if (stream.isRunning()) {
+    tries = 0;
     stream.loop();
     delay(5);
     savePreferences();
-  } else {
-    delay(250);
-    startRadio();
-  }
+  } /*
+  else if (!hasRadioIdxChanged) {
+    delay(10);
+    if (tries++ > 100) restartRadio();
+  }*/
 
   handleIRCommands();
   if (buttonNext.pressed()) changeRadioIndex(true);
@@ -124,30 +126,6 @@ bool hasTimePassed (unsigned long time) {
   return millis() - lastAction > time;
 }
 
-void copyRadioStation(const char* str) {
-  unsigned int len = strlen(str);
-  if (len == 0) {
-    radioLabel[0] = '\0';
-  } else {
-    unsigned int limit = len > RADIO_LIMIT ? RADIO_LIMIT : len;
-    strncpy(radioLabel, str, limit);
-    capitalizeWords(radioLabel);
-    radioLabel[limit] = '\0';
-  }
-}
-
-void copyRadioSong(const char* str) {
-  unsigned int len = strlen(str);
-  if (len == 0) {
-    songLabel[0] = '\0';
-  } else {
-   unsigned int limit = len > SONG_LIMIT ? SONG_LIMIT : len;
-   strncpy(songLabel, str, limit);
-    capitalizeWords(songLabel);
-    songLabel[limit] = '\0';
-  }
-}
-
 void savePreferences() {
   if (hasTimePassed(SAVE_DELAY)) {
     if (stream.isRunning() && !radioIdxSaved) {
@@ -170,25 +148,27 @@ void savePreferences() {
 }
 
 void startRadio() {
-  Serial.println(RADIOS[radioIdx]);
-  Serial.println(LABELS[radioIdx]);
-
-  copyRadioStation(LABELS[radioIdx]);
-  copyRadioSong("");
-  displayData(radioLabel, songLabel);
+  Serial.printf("StartRadio %s - %s\n", RADIOS[radioIdx], LABELS[radioIdx]);
+  copyString(LABELS[radioIdx], radioLabel);
+  copyString("", songLabel);
+  displayData(radioLabel, songLabel, volume);
   stream.connecttohost(RADIOS[radioIdx]);
+  Serial.printf("codec: %s - bitrate: %lu kbps\n", stream.currentCodec(), stream.bitrate());
+}
 
-  Serial.printf("codec: %s\n", stream.currentCodec());
-  Serial.printf("bitrate: %lu kbps\n", stream.bitrate());
+void restartRadio() {
+  Serial.printf("RestartRadio %s - %s\n", RADIOS[radioIdx], LABELS[radioIdx]);
+  stream.connecttohost(RADIOS[radioIdx]);
+  Serial.printf("codec: %s - bitrate: %lu kbps\n", stream.currentCodec(), stream.bitrate());
 }
 
 void changeRadioIndex(bool next) {
   if (stream.isRunning()) stream.stopSong();
   if (next) radioIdx = radioIdx < NB_RADIOS - 1 ? radioIdx + 1 : 0;
   else radioIdx = radioIdx > 0 ? radioIdx - 1 : NB_RADIOS - 1;
-  copyRadioStation(LABELS[radioIdx]);
-  copyRadioSong("");
-  displayData(radioLabel, songLabel);
+  copyString(LABELS[radioIdx], radioLabel);
+  copyString("", songLabel);
+  displayData(radioLabel, songLabel, volume);
   hasRadioIdxChanged = true;
   lastAction = millis();
 }
@@ -208,6 +188,7 @@ void changeVolume(bool increase) {
   volumeSaved = false;
   lastAction = millis();
   stream.setVolume(volume);
+  displayData(radioLabel, songLabel, volume);
 }
 
 void changeRadio () {
@@ -221,20 +202,20 @@ void changeRadio () {
 
 void audio_showstation(const char* station) {
   Serial.printf("showstation: %s\n", station);
-  char * aac = strstr(station, ".aac");
-  char * mp3 = strstr(station, ".mp3");
+  char* aac = strstr(station, ".aac");
+  char* mp3 = strstr(station, ".mp3");
   if (aac == NULL && mp3 == NULL) {
-    copyRadioStation(station);
-    displayData(radioLabel, songLabel);
+    copyString(station, radioLabel);
+    displayData(radioLabel, songLabel, volume);
   }
 }
 
 void audio_showstreamtitle(const char* song) {
   Serial.printf("streamtitle: %s\n", song);
-  copyRadioSong(song);
-  displayData(radioLabel, songLabel);
+  copyString(song, songLabel);
+  displayData(radioLabel, songLabel, volume);
 }
 
 void audio_eof_stream(const char* eof) {
-  Serial.printf("eof: %s\n", eof);
+  Serial.printf("End of stream: %s\n", eof);
 }

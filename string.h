@@ -1,3 +1,8 @@
+void copyString(const char* str, char* buffer) {
+  unsigned int len = strlen(str);
+  strncpy(buffer, str, len);
+  buffer[len] = '\0';
+}
 
 void capitalizeWords(char *str) {
     // Check if the string is not empty
@@ -21,3 +26,14 @@ void capitalizeWords(char *str) {
     }
 }
 
+void formatString (const char* str, char* buffer, unsigned int limit) {
+  unsigned int len = strlen(str);
+  if (len == 0) {
+    buffer[0] = '\0';
+  } else {
+    unsigned int c = len > limit ? limit : len;
+    strncpy(buffer, str, c);
+    capitalizeWords(buffer);
+    buffer[c] = '\0';
+  }
+}
