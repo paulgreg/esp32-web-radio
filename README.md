@@ -14,7 +14,7 @@ An ESP32 web radio, inspired by [KitchenRadio](https://github.com/jeroenlukas/Ki
 ## Hardware
 
  - ESP32-WROOM-32D/ESP32-WROOM-32U with Antenna
- - VS1003B VS1053 MP3 Module Dev elopment Board (make sure it decodes AAC for better stream quality)
+ - VS1003B VS1053 MP3 Module Development Board (make sure it decodes AAC for better stream quality)
  - 2.4" 128x64 OLED I2C SSD1309 Display Module
  - 2 buttons
  - IR receiver

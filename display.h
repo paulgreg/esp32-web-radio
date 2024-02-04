@@ -43,20 +43,25 @@ void displayError(const char* s) {
 char radioBuffer[255];
 char radioSong[255];
 
-void displayData(const char* radio, const char* song, unsigned int volume) {
+void displayData(const char* radio, const char* song, unsigned int volume, bool mute, bool eof) {
+  Serial.printf("radio « %s », song « %s », vol: %i, mute: %i, eof: %i\n", radio, song, volume, mute, eof);
+
+  formatString(radio, radioBuffer, RADIO_LEN_LIMIT);
+  formatString(song, radioSong, SONG_LEN_LIMIT);
+
   display.clearDisplay();
-
-  if (strlen(song) == 0) {
-
-    formatString(radio, radioBuffer, 64);
-
+  if (eof) { // End of stream
+    display.setFont(&Roboto_Medium_14);
+    display.setCursor(0, 10);
+    display.print(radioBuffer);
+    display.setFont(&Roboto_Medium_12);
+    display.setCursor(0, 30);
+    display.print("Stream error");
+  } else if (strlen(song) == 0) { // only radio name
     display.setFont(&Roboto_Medium_16);
     display.setCursor(0, 20);
     display.print(radioBuffer);
-  } else {
-    formatString(radio, radioBuffer, RADIO_LIMIT);
-    formatString(song, radioSong, SONG_LIMIT);
-
+  } else { // with radio and song
     display.setFont(&Roboto_Medium_14);
     display.setCursor(0, 10);
     display.print(radioBuffer);
@@ -66,8 +71,12 @@ void displayData(const char* radio, const char* song, unsigned int volume) {
   }
 
   display.setFont(&Roboto_Medium_12);
-  display.setCursor(80, 60);
-  display.printf("%*i %%", 3, volume);
+  display.setCursor(90, 60);
+  if (mute) {
+    display.printf("  - %%");
+  } else {
+    display.printf("%*i %%", 3, volume);
+  }
 
   display.display();
 }

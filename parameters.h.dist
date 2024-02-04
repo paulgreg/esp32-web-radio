@@ -3,9 +3,8 @@
 
 #define MAX_RADIOS        50
 #define WEB_RADIOS_URL    "https://example.com/radios.json"
-#define WEB_RADIO_USER    "username"
-#define WEB_RADIO_PASSWD  "password"
-#define MAX_RETRIES       50
+#define WEB_RADIO_USER    "username" // can be an empty string
+#define WEB_RADIO_PASSWD  "password" // can be an empty string
 #define RETRIES_DELAY     5 * 1000
 
 #define SPI_CLK_PIN     18
@@ -26,8 +25,8 @@
 #define VOLUME_MAX      100
 #define VOLUME_STEP     2
 
-#define RADIO_LIMIT     16
-#define SONG_LIMIT      42
+#define RADIO_LEN_LIMIT 16
+#define SONG_LEN_LIMIT  42
 
 #define BTN_NEXT        32
 #define BTN_PREVIOUS    33

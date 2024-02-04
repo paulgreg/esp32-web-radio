@@ -32,6 +32,9 @@ unsigned long lastAction = millis();
 bool radioIdxSaved = true;
 unsigned int volume = VOLUME_MAX;
 bool volumeSaved = true;
+bool mute = false;
+bool eof = false;
+
 char radioLabel[255];
 char songLabel[255];
 
@@ -87,7 +90,6 @@ void setup() {
   }
 }
 
-
 void loop() {    
   if (stream.isRunning()) {
     stream.loop();
@@ -123,7 +125,7 @@ void handleIRCommands() {
         toggleMute();
         break;
       default:	
-        Serial.println("IRCommand: unknown");	  
+        Serial.println("IRCommand: unknown");
     }
     delay(100);
 		IrReceiver.resume();
@@ -159,7 +161,8 @@ void startRadio() {
   Serial.printf("StartRadio %s - %s\n", webRadios.url[radioIdx], webRadios.name[radioIdx]);
   copyString(webRadios.name[radioIdx], radioLabel);
   copyString("", songLabel);
-  displayData(radioLabel, songLabel, volume);
+  eof = false;
+  refreshDisplay();
   stream.connecttohost(webRadios.url[radioIdx]);
   Serial.printf("codec: %s - bitrate: %lu kbps\n", stream.currentCodec(), stream.bitrate());
 }
@@ -170,27 +173,28 @@ void changeRadioIndex(bool next) {
   else radioIdx = radioIdx > 0 ? radioIdx - 1 : webRadios.max - 1;
   copyString(webRadios.name[radioIdx], radioLabel);
   copyString("", songLabel);
-  displayData(radioLabel, songLabel, volume);
+  refreshDisplay();
   hasRadioIdxChanged = true;
   lastAction = millis();
 }
 
 void toggleMute() {
-  unsigned int streamVolume = stream.getVolume() == volume;
-  unsigned int v = streamVolume ? 0 : volume;
-  Serial.printf("Mute %u\n", v);
+  mute = stream.getVolume() == volume;
+  unsigned int v = mute ? 0 : volume;
   stream.setVolume(v);
+  refreshDisplay();
 }
 
 void changeVolume(bool increase) {
-  volume = stream.getVolume();
-  if (increase && volume <= (VOLUME_MAX - VOLUME_STEP)) volume += VOLUME_STEP;
-  else if (!increase && volume >= VOLUME_STEP) volume -= VOLUME_STEP;
-  Serial.printf("Changing volume %u\n", volume);
-  volumeSaved = false;
-  lastAction = millis();
-  stream.setVolume(volume);
-  displayData(radioLabel, songLabel, volume);
+  if (!mute) {
+    volume = stream.getVolume();
+    if (increase && volume <= (VOLUME_MAX - VOLUME_STEP)) volume += VOLUME_STEP;
+    else if (!increase && volume >= VOLUME_STEP) volume -= VOLUME_STEP;
+    volumeSaved = false;
+    lastAction = millis();
+    stream.setVolume(volume);
+    refreshDisplay();
+  }
 }
 
 void changeRadio () {
@@ -208,16 +212,22 @@ void audio_showstation(const char* station) {
   char* mp3 = strstr(station, ".mp3");
   if (aac == NULL && mp3 == NULL) {
     copyString(station, radioLabel);
-    displayData(radioLabel, songLabel, volume);
+    refreshDisplay();
   }
 }
 
 void audio_showstreamtitle(const char* song) {
   Serial.printf("streamtitle: %s\n", song);
   copyString(song, songLabel);
-  displayData(radioLabel, songLabel, volume);
+  refreshDisplay();
 }
 
-void audio_eof_stream(const char* eof) {
-  Serial.printf("End of stream: %s\n", eof);
+void audio_eof_stream(const char* error) {
+  Serial.printf("End of stream: %s\n", error);
+  eof = true;
+  refreshDisplay();
+}
+
+void refreshDisplay() {
+  displayData(radioLabel, songLabel, volume, mute, eof);
 }
