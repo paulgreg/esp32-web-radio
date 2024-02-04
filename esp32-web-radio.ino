@@ -1,5 +1,5 @@
 #include "parameters.h"
-#include "string.h"
+#include "stringUtils.h"
 
 #include "IRremote.hpp"
 
@@ -12,6 +12,9 @@
 #include <ESP32_VS1053_Stream.h>
 
 #include <WiFi.h>
+#include <HTTPClient.h>
+#include <Arduino_JSON.h>
+#include "WebRadios.h"
 #include "network.h"
 
 
@@ -21,6 +24,8 @@ ESP32_VS1053_Stream stream;
 Button buttonNext(BTN_NEXT);
 Button buttonPrevious(BTN_PREVIOUS);
 
+WebRadios webRadios;
+
 unsigned short radioIdx = 0;
 bool hasRadioIdxChanged = false;
 unsigned long lastAction = millis();
@@ -29,7 +34,15 @@ unsigned int volume = VOLUME_MAX;
 bool volumeSaved = true;
 char radioLabel[255];
 char songLabel[255];
-unsigned int tries = 0;
+
+boolean fetchWebRadiosData() {
+  boolean success = false;
+  while(!success) {
+    delay(RETRIES_DELAY);
+    success = getWebRadiosJSON(&webRadios);
+  }
+  return success;
+}
 
 void setup() {
   radioLabel[0] = songLabel[0] ='\0';
@@ -59,33 +72,28 @@ void setup() {
     Serial.println("Decoder not running");
     while (1) delay(1000);
   }
-  Serial.println("decoder running");
-
+  
   displayText("Wifi");
-
-  Serial.println("wifi:connecting");
   if (!connectToWifi()) {
-    Serial.println("error:WIFI");
     displayError("Wifi error");
   } else {
-    stream.setVolume(volume);
-    displayText("Lets go");
-    startRadio();
+    displayText("Fetch radios");
+    if (fetchWebRadiosData()) {
+      radioIdx = radioIdx < webRadios.max ? radioIdx : 0;
+      stream.setVolume(volume);
+      displayText("Lets go");
+      startRadio();
+    }
   }
 }
 
 
 void loop() {    
   if (stream.isRunning()) {
-    tries = 0;
     stream.loop();
     delay(5);
     savePreferences();
-  } /*
-  else if (!hasRadioIdxChanged) {
-    delay(10);
-    if (tries++ > 100) restartRadio();
-  }*/
+  }
 
   handleIRCommands();
   if (buttonNext.pressed()) changeRadioIndex(true);
@@ -148,25 +156,19 @@ void savePreferences() {
 }
 
 void startRadio() {
-  Serial.printf("StartRadio %s - %s\n", RADIOS[radioIdx], LABELS[radioIdx]);
-  copyString(LABELS[radioIdx], radioLabel);
+  Serial.printf("StartRadio %s - %s\n", webRadios.url[radioIdx], webRadios.name[radioIdx]);
+  copyString(webRadios.name[radioIdx], radioLabel);
   copyString("", songLabel);
   displayData(radioLabel, songLabel, volume);
-  stream.connecttohost(RADIOS[radioIdx]);
-  Serial.printf("codec: %s - bitrate: %lu kbps\n", stream.currentCodec(), stream.bitrate());
-}
-
-void restartRadio() {
-  Serial.printf("RestartRadio %s - %s\n", RADIOS[radioIdx], LABELS[radioIdx]);
-  stream.connecttohost(RADIOS[radioIdx]);
+  stream.connecttohost(webRadios.url[radioIdx]);
   Serial.printf("codec: %s - bitrate: %lu kbps\n", stream.currentCodec(), stream.bitrate());
 }
 
 void changeRadioIndex(bool next) {
   if (stream.isRunning()) stream.stopSong();
-  if (next) radioIdx = radioIdx < NB_RADIOS - 1 ? radioIdx + 1 : 0;
-  else radioIdx = radioIdx > 0 ? radioIdx - 1 : NB_RADIOS - 1;
-  copyString(LABELS[radioIdx], radioLabel);
+  if (next) radioIdx = radioIdx < webRadios.max - 1 ? radioIdx + 1 : 0;
+  else radioIdx = radioIdx > 0 ? radioIdx - 1 : webRadios.max - 1;
+  copyString(webRadios.name[radioIdx], radioLabel);
   copyString("", songLabel);
   displayData(radioLabel, songLabel, volume);
   hasRadioIdxChanged = true;

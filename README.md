@@ -2,6 +2,15 @@
 
 An ESP32 web radio, inspired by [KitchenRadio](https://github.com/jeroenlukas/KitchenRadio). 🙏
 
+## Features
+
+ - mp3 and aac decoding (depends of VS1053 module)
+ - OLED screen displaying radio, songs, volume
+ - fetch radios from a json file (to easily update them)
+ - IR remote (next / previous / volume + / volume - / mute)
+ - next / previous button
+
+
 ## Hardware
 
  - ESP32-WROOM-32D/ESP32-WROOM-32U with Antenna
@@ -40,9 +49,12 @@ From [that example](https://github.com/baldram/ESP_VS1053_Library/blob/master/ex
 
 ## Configuration
 
-Copy `parameters.h.dist` to `parameters.h` and change it to your settings
+Copy `parameters.h.dist` to `parameters.h` and change it to your settings.
 
-Note : some VS1053 board are’nt able to decode aac streams. You can usually find mp3 alternative (or change board).
+⚠️ Web Radios are fetch from a JSON file. You'll need to create a JSON file containing web radios name and URL (see `WebRadios.h`) and host it somewhere on the internet.
+
+Note : some VS1053 board aren't able to decode aac streams. You can usually find mp3 alternative (or change board).
+
 
 ## Librairies
 

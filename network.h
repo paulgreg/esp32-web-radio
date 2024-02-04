@@ -29,6 +29,36 @@ boolean connectToWifi() {
   return true;
 }
 
-boolean disconnectFromWifi() {
-  WiFi.disconnect();
+String httpGet(const char* url, const char* login, const char* password) {
+  String s = "";
+  if ((WiFi.status() == WL_CONNECTED)) {
+    Serial.print("Connecting to "); Serial.println(url);
+    HTTPClient http;
+    http.begin(url);
+    if (strlen(login) > 0 && strlen(password) > 0) http.setAuthorization(login, password);
+    int httpCode = http.GET();
+     Serial.print("HTTP code : "); Serial.println(httpCode);
+    if (httpCode > 0) {
+      s = http.getString();
+      Serial.print("Reponse length : "); Serial.println(s.length());
+      Serial.println(s);
+    } else {
+      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+    }
+    http.end();
+  }  
+  return s;
+}
+
+boolean getWebRadiosJSON(WebRadios* webRadios) {
+  boolean success = false;
+  String data = httpGet(WEB_RADIOS_URL, WEB_RADIO_USER, WEB_RADIO_PASSWD);
+  JSONVar json = JSON.parse(data);
+  if (JSON.typeof(json) == "undefined") {
+    Serial.println("Parsing data input failed!");
+  } else {
+    fillWebRadiosFromJson(json, webRadios);
+    success = true;
+  }
+  return success;
 }

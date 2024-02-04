@@ -1,3 +1,13 @@
+#define WIFI_SSID       "wifi ssid"
+#define WIFI_PASSWORD   "wifi password"
+
+#define MAX_RADIOS        50
+#define WEB_RADIOS_URL    "https://example.com/radios.json"
+#define WEB_RADIO_USER    "username"
+#define WEB_RADIO_PASSWD  "password"
+#define MAX_RETRIES       50
+#define RETRIES_DELAY     5 * 1000
+
 #define SPI_CLK_PIN     18
 #define SPI_MISO_PIN    19
 #define SPI_MOSI_PIN    23
@@ -15,91 +25,12 @@
 
 #define VOLUME_MAX      100
 #define VOLUME_STEP     2
+
 #define RADIO_LIMIT     16
 #define SONG_LIMIT      42
 
 #define BTN_NEXT        32
 #define BTN_PREVIOUS    33
 
-#define WIFI_SSID       "WIFI_SSID"
-#define WIFI_PASSWORD   "WIFI_PASSWORD"
-
 #define CHANGE_RADIO_DELAY    1000
 #define SAVE_DELAY            60 * 1000
-
-// Some chip aren’t able to decode aac, you can fallback to mp3 streams : #define FIP "http://icecast.radiofrance.fr/fip-mifi.mp3"
-#define FIP "http://icecast.radiofrance.fr/fip-hifi.aac"
-#define FIP_JAZZ "http://icecast.radiofrance.fr/fipjazz-hifi.aac"
-#define FIP_POP "http://icecast.radiofrance.fr/fippop-hifi.aac"
-#define FIP_ROCK "http://icecast.radiofrance.fr/fiprock-hifi.aac"
-#define FIP_METAL "http://icecast.radiofrance.fr/fipmetal-hifi.aac"
-#define FIP_ELECTRO "http://icecast.radiofrance.fr/fipelectro-hifi.aac"
-#define FIP_GROOVE "http://icecast.radiofrance.fr/fipgroove-hifi.aac"
-#define FIP_WORLD "http://icecast.radiofrance.fr/fipworld-hifi.aac"
-#define FIP_FRANCAIS "http://icecast.radiofrance.fr/fipsacrefrancais-hifi.aac"
-#define FIP_REGGAE "http://icecast.radiofrance.fr/fipreggae-hifi.aac"
-#define FIP_NEWS "http://icecast.radiofrance.fr/fipnouveautes-hifi.aac"
-
-#define FRANCE_INFO "http://icecast.radiofrance.fr/franceinfo-hifi.aac"
-#define FRANCE_CULTURE "http://icecast.radiofrance.fr/franceculture-hifi.aac"
-#define FRANCE_MUSIQUE "http://icecast.radiofrance.fr/francemusique-hifi.aac"
-#define FRANCE_MUSIQUE_JAZZ "http://icecast.radiofrance.fr/francemusiquelajazz-hifi.aac"
-
-#define BOSSA_NOVA "http://185.33.21.112/bossanova_128"
-#define WAVE "http://75.102.53.58/1066"
-#define LOUNGE "http://64.95.243.43:8020/stream"
-#define FUNKY_RADIO "http://176.31.111.65:4744"
-#define RETRO "http://ice1.somafm.com/u80s-128-mp3"
-#define CLASSIC "http://media-ice.musicradio.com/ClassicFMMP3"
-
-#define NIGHTRIDE "http://stream.nightride.fm/nightride.mp3"
-
-#define NB_RADIOS 22
-const char* RADIOS[NB_RADIOS] = {
-  FIP,
-  FIP_JAZZ,
-  FIP_POP,
-  FIP_ROCK,
-  FIP_METAL,
-  FIP_ELECTRO,
-  FIP_GROOVE,
-  FIP_WORLD,
-  FIP_FRANCAIS,
-  FIP_REGGAE,
-  FIP_NEWS,
-  FRANCE_INFO,
-  FRANCE_CULTURE,
-  FRANCE_MUSIQUE,
-  FRANCE_MUSIQUE_JAZZ,
-  BOSSA_NOVA,
-  WAVE,
-  LOUNGE,
-  FUNKY_RADIO,
-  RETRO,
-  CLASSIC,
-  NIGHTRIDE
-};
-const char* LABELS[NB_RADIOS] = {
-  "FIP",
-  "FIP Jazz",
-  "FIP Pop",
-  "FIP Rock",
-  "FIP Metal",
-  "FIP Electro",
-  "FIP Groove",
-  "FIP Monde",
-  "FIP France",
-  "FIP Reggae",
-  "FIP Nouveautes",
-  "France Info",
-  "France Culture",
-  "France Musique",
-  "France Musique Jazz",
-  "Bossa Nova",
-  "The Wave",
-  "The Lounge",
-  "Funky Radio",
-  "80s",
-  "Classical",
-  "Night Ride"
-};

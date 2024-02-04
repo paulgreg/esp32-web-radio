@@ -22,6 +22,7 @@ void setupScreen() {
 }
 
 void displayText(const char* s) {
+  Serial.println(s);
   display.clearDisplay();
   display.setFont(&Roboto_Medium_16);
   display.setCursor(0, 24);
@@ -30,6 +31,7 @@ void displayText(const char* s) {
 }
 
 void displayError(const char* s) {
+  Serial.println(s);
   display.clearDisplay();
   display.invertDisplay(true);
   display.setFont(&Roboto_Medium_16);
@@ -38,7 +40,6 @@ void displayError(const char* s) {
   display.display();
 }
 
-
 char radioBuffer[255];
 char radioSong[255];
 
@@ -46,6 +47,7 @@ void displayData(const char* radio, const char* song, unsigned int volume) {
   display.clearDisplay();
 
   if (strlen(song) == 0) {
+
     formatString(radio, radioBuffer, 64);
 
     display.setFont(&Roboto_Medium_16);
