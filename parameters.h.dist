@@ -28,8 +28,5 @@
 #define RADIO_LEN_LIMIT 16
 #define SONG_LEN_LIMIT  42
 
-#define BTN_NEXT        32
-#define BTN_PREVIOUS    33
-
 #define CHANGE_RADIO_DELAY    1000
 #define SAVE_DELAY            60 * 1000

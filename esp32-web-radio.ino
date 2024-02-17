@@ -3,7 +3,6 @@
 
 #include "IRremote.hpp"
 
-#include <Button.h>
 #include <Preferences.h>
 
 #include "display.h"
@@ -21,8 +20,6 @@
 Preferences preferences;
 ESP32_VS1053_Stream stream;
 
-Button buttonNext(BTN_NEXT);
-Button buttonPrevious(BTN_PREVIOUS);
 
 WebRadios webRadios;
 
@@ -54,9 +51,6 @@ void setup() {
   Serial.println("Web Radio");
 
   IrReceiver.begin(IR_RECEIVE_PIN, ENABLE_LED_FEEDBACK);  
-
-  buttonNext.begin();
-  buttonPrevious.begin();
 
   preferences.begin("webradio", false);
   radioIdx = preferences.getInt("radioIdx", radioIdx);
@@ -96,11 +90,7 @@ void loop() {
     delay(5);
     savePreferences();
   }
-
   handleIRCommands();
-  if (buttonNext.pressed()) changeRadioIndex(true);
-  else if (buttonPrevious.pressed()) changeRadioIndex(false);
-  
   changeRadio();
 }
 
@@ -167,6 +157,12 @@ void startRadio() {
   Serial.printf("codec: %s - bitrate: %lu kbps\n", stream.currentCodec(), stream.bitrate());
 }
 
+void restartRadio() {
+  Serial.printf("RestartRadio %s - %s\n", webRadios.url[radioIdx], webRadios.name[radioIdx]);
+  eof = false;
+  stream.connecttohost(webRadios.url[radioIdx]);
+}
+
 void changeRadioIndex(bool next) {
   if (stream.isRunning()) stream.stopSong();
   if (next) radioIdx = radioIdx < webRadios.max - 1 ? radioIdx + 1 : 0;
@@ -226,6 +222,8 @@ void audio_eof_stream(const char* error) {
   Serial.printf("End of stream: %s\n", error);
   eof = true;
   refreshDisplay();
+  delay(1000);
+  restartRadio();
 }
 
 void refreshDisplay() {

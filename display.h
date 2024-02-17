@@ -1,7 +1,17 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include "font.h"
+
+
+#include "font-roboto.h"
+#define FONT_SMALL  &Roboto_Medium_12
+#define FONT_MEDIUM &Roboto_Medium_14
+#define FONT_BIG    &Roboto_Medium_16
+
+// #include "font-dejavu.h"
+// #define FONT_SMALL  &DejaVu_LGC_Sans_Mono_12
+// #define FONT_MEDIUM &DejaVu_LGC_Sans_Mono_14
+// #define FONT_BIG    &DejaVu_LGC_Sans_Mono_16
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -16,6 +26,7 @@ void setupScreen() {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
+  display.setRotation(2);
   display.cp437(true);
   display.clearDisplay();
   display.setTextColor(WHITE);
@@ -24,8 +35,8 @@ void setupScreen() {
 void displayText(const char* s) {
   Serial.println(s);
   display.clearDisplay();
-  display.setFont(&Roboto_Medium_16);
-  display.setCursor(0, 24);
+  display.setFont(FONT_BIG);
+  display.setCursor(10, 40);
   display.print(s);
   display.display();
 }
@@ -34,8 +45,8 @@ void displayError(const char* s) {
   Serial.println(s);
   display.clearDisplay();
   display.invertDisplay(true);
-  display.setFont(&Roboto_Medium_16);
-  display.setCursor(0, 10);
+  display.setFont(FONT_BIG);
+  display.setCursor(10, 40);
   display.print(s);
   display.display();
 }
@@ -51,27 +62,28 @@ void displayData(const char* radio, const char* song, unsigned int volume, bool 
 
   display.clearDisplay();
   if (eof) { // End of stream
-    display.setFont(&Roboto_Medium_14);
-    display.setCursor(0, 10);
+    display.setFont(FONT_MEDIUM);
+    display.setCursor(0, 15);
     display.print(radioBuffer);
-    display.setFont(&Roboto_Medium_12);
-    display.setCursor(0, 30);
+    display.setFont();
+    display.setCursor(0, 35);
     display.print("Stream error");
   } else if (strlen(song) == 0) { // only radio name
-    display.setFont(&Roboto_Medium_16);
-    display.setCursor(0, 20);
+    display.setFont(FONT_BIG);
+    display.setCursor(0, 25);
     display.print(radioBuffer);
   } else { // with radio and song
-    display.setFont(&Roboto_Medium_14);
-    display.setCursor(0, 10);
+    display.setFont();
+    display.setFont(FONT_MEDIUM);
+    display.setCursor(0, 12);
     display.print(radioBuffer);
-    display.setFont(&Roboto_Medium_12);
-    display.setCursor(0, 30);
+    display.setFont(FONT_SMALL);
+    display.setCursor(0, 32);
     display.print(radioSong);
   }
 
-  display.setFont(&Roboto_Medium_12);
-  display.setCursor(90, 60);
+  display.setFont(FONT_SMALL);
+  display.setCursor(94, 62);
   if (mute) {
     display.printf("  - %%");
   } else {
