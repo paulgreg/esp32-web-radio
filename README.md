@@ -1,6 +1,6 @@
 # esp32-web-radio
 
-An ESP32 web radio, inspired by [KitchenRadio](https://github.com/jeroenlukas/KitchenRadio). 🙏
+An ESP32 web radio, inspired by [KitchenRadio](https://github.com/jeroenlukas/KitchenRadio) and made possible using [CelliesProjects/ESP32_VS1053_Stream](https://github.com/CelliesProjects/ESP32_VS1053_Stream) library. 🙏
 
 ## Features
 
